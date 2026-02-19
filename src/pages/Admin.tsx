@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, LogIn, LogOut } from "lucide-react";
+import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Session } from "@supabase/supabase-js";
-import { useEffect } from "react";
 
 const Admin = () => {
   const queryClient = useQueryClient();
@@ -26,6 +25,11 @@ const Admin = () => {
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+
+  // Profile form
+  const [profileName, setProfileName] = useState("");
+  const [profileBio, setProfileBio] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState("");
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -44,6 +48,20 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("projects").select("*").order("created_at", { ascending: false });
       if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ["site-profile"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_profile").select("*").limit(1).maybeSingle();
+      if (error) throw error;
+      if (data) {
+        setProfileName(data.name || "");
+        setProfileBio(data.bio || "");
+        setProfilePhoto(data.photo_url || "");
+      }
       return data;
     },
   });
@@ -71,6 +89,23 @@ const Admin = () => {
       queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       toast({ title: "Projeto removido." });
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const updateProfile = useMutation({
+    mutationFn: async () => {
+      if (!profile?.id) throw new Error("Perfil não encontrado");
+      const { error } = await supabase.from("site_profile").update({
+        name: profileName,
+        bio: profileBio,
+        photo_url: profilePhoto,
+      }).eq("id", profile.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["site-profile"] });
+      toast({ title: "Perfil atualizado!" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
@@ -111,14 +146,8 @@ const Admin = () => {
               {isSignUp ? "Criar Conta" : "Login Admin"}
             </h2>
             <form onSubmit={handleAuth} className="space-y-4">
-              <Input
-                type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="bg-secondary/50 border-border/50 focus:neon-border-purple"
-              />
-              <Input
-                type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)}
-                className="bg-secondary/50 border-border/50 focus:neon-border-purple"
-              />
+              <Input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-secondary/50 border-border/50" />
+              <Input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary/50 border-border/50" />
               <Button type="submit" className="w-full bg-primary hover:bg-primary/80 text-primary-foreground">
                 <LogIn className="w-4 h-4 mr-2" />
                 {isSignUp ? "Criar Conta" : "Entrar"}
@@ -148,6 +177,38 @@ const Admin = () => {
             <LogOut className="w-4 h-4 mr-2" /> Sair
           </Button>
         </div>
+
+        {/* Profile Section */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-6 mb-8">
+          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <User className="w-5 h-5 text-neon-purple" /> Meu Perfil
+          </h2>
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Photo preview */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border/50 bg-secondary/50 flex items-center justify-center">
+                {profilePhoto ? (
+                  <img src={profilePhoto} alt="Foto" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-8 h-8 text-muted-foreground" />
+                )}
+              </div>
+            </div>
+            <div className="flex-1 space-y-4">
+              <Input placeholder="Seu Nome" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="bg-secondary/50 border-border/50" />
+              <Input placeholder="URL da Foto de Perfil" value={profilePhoto} onChange={(e) => setProfilePhoto(e.target.value)} className="bg-secondary/50 border-border/50" />
+              <Textarea placeholder="Sua biografia..." value={profileBio} onChange={(e) => setProfileBio(e.target.value)} className="bg-secondary/50 border-border/50" rows={3} />
+              <Button
+                onClick={() => updateProfile.mutate()}
+                disabled={updateProfile.isPending}
+                className="bg-neon-purple/20 border border-neon-purple/40 text-foreground hover:bg-neon-purple/30"
+              >
+                {updateProfile.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                Salvar Perfil
+              </Button>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Add Project Form */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-xl p-6 mb-8">
