@@ -1,0 +1,212 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
+import { Loader2, Plus, Trash2, LogIn, LogOut } from "lucide-react";
+import { motion } from "framer-motion";
+import type { Session } from "@supabase/supabase-js";
+import { useEffect } from "react";
+
+const Admin = () => {
+  const queryClient = useQueryClient();
+  const [session, setSession] = useState<Session | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // Auth form
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+
+  // Project form
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [link, setLink] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setAuthLoading(false);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setAuthLoading(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const { data: projects, isLoading } = useQuery({
+    queryKey: ["admin-projects"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("projects").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const addProject = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("projects").insert({ name, description, link, image_url: imageUrl });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      setName(""); setDescription(""); setLink(""); setImageUrl("");
+      toast({ title: "Projeto adicionado!" });
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const deleteProject = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("projects").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({ title: "Projeto removido." });
+    },
+    onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: "Conta criada! Verifique seu e-mail para confirmar." });
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
+      toast({ title: "Login realizado!" });
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({ title: "Logout realizado." });
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-neon-purple" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-background bg-grid">
+        <Navbar />
+        <div className="pt-32 px-6 max-w-md mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-8">
+            <h2 className="text-2xl font-bold text-gradient mb-6 text-center">
+              {isSignUp ? "Criar Conta" : "Login Admin"}
+            </h2>
+            <form onSubmit={handleAuth} className="space-y-4">
+              <Input
+                type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)}
+                className="bg-secondary/50 border-border/50 focus:neon-border-purple"
+              />
+              <Input
+                type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)}
+                className="bg-secondary/50 border-border/50 focus:neon-border-purple"
+              />
+              <Button type="submit" className="w-full bg-primary hover:bg-primary/80 text-primary-foreground">
+                <LogIn className="w-4 h-4 mr-2" />
+                {isSignUp ? "Criar Conta" : "Entrar"}
+              </Button>
+            </form>
+            <button
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="w-full mt-4 text-sm text-muted-foreground hover:text-neon-cyan transition-colors text-center"
+            >
+              {isSignUp ? "Já tem conta? Faça login" : "Não tem conta? Criar uma"}
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background bg-grid">
+      <Navbar />
+      <div className="pt-32 px-6 max-w-4xl mx-auto pb-20">
+        <div className="flex items-center justify-between mb-8">
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-bold text-gradient">
+            Painel Admin
+          </motion.h1>
+          <Button variant="outline" size="sm" onClick={handleLogout} className="border-border/50 text-muted-foreground hover:text-foreground">
+            <LogOut className="w-4 h-4 mr-2" /> Sair
+          </Button>
+        </div>
+
+        {/* Add Project Form */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-xl p-6 mb-8">
+          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Plus className="w-5 h-5 text-neon-cyan" /> Adicionar Projeto
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input placeholder="Nome do Projeto" value={name} onChange={(e) => setName(e.target.value)} className="bg-secondary/50 border-border/50" />
+            <Input placeholder="Link do Site" value={link} onChange={(e) => setLink(e.target.value)} className="bg-secondary/50 border-border/50" />
+            <Input placeholder="URL da Imagem de Capa" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="bg-secondary/50 border-border/50 md:col-span-2" />
+            <Textarea placeholder="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} className="bg-secondary/50 border-border/50 md:col-span-2" rows={3} />
+          </div>
+          <Button
+            onClick={() => addProject.mutate()}
+            disabled={!name || addProject.isPending}
+            className="mt-4 bg-primary hover:bg-primary/80 text-primary-foreground"
+          >
+            {addProject.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+            Adicionar
+          </Button>
+        </motion.div>
+
+        {/* Project List */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Projetos Existentes</h2>
+          {isLoading ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="w-6 h-6 animate-spin text-neon-purple" />
+            </div>
+          ) : projects && projects.length > 0 ? (
+            <div className="space-y-3">
+              {projects.map((p) => (
+                <div key={p.id} className="glass-card rounded-lg p-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 min-w-0">
+                    {p.image_url && (
+                      <img src={p.image_url} alt={p.name} className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground truncate">{p.name}</p>
+                      <p className="text-sm text-muted-foreground truncate">{p.description}</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost" size="icon"
+                    onClick={() => deleteProject.mutate(p.id)}
+                    className="text-destructive hover:text-destructive/80 flex-shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">Nenhum projeto ainda.</p>
+          )}
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+export default Admin;
