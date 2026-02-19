@@ -1,10 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Code2, Shield } from "lucide-react";
+import { Code2 } from "lucide-react";
 
 const Navbar = () => {
-  const location = useLocation();
-
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -18,26 +16,6 @@ const Navbar = () => {
           </div>
           <span className="text-lg font-bold text-gradient">Portfólio</span>
         </Link>
-
-        <div className="flex items-center gap-6">
-          <Link
-            to="/"
-            className={`text-sm font-medium transition-colors ${
-              location.pathname === "/" ? "text-neon-cyan" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Projetos
-          </Link>
-          <Link
-            to="/admin"
-            className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-              location.pathname === "/admin" ? "text-neon-cyan" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Shield className="w-3.5 h-3.5" />
-            Admin
-          </Link>
-        </div>
       </div>
     </motion.nav>
   );
