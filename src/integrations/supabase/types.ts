@@ -41,6 +41,30 @@ export type Database = {
         }
         Relationships: []
       }
+      site_profile: {
+        Row: {
+          bio: string | null
+          id: string
+          name: string
+          photo_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
