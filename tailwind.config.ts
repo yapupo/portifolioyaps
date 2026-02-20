@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
+        display: ["Orbitron", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,6 +56,7 @@ export default {
           purple: "hsl(var(--neon-purple))",
           cyan: "hsl(var(--neon-cyan))",
           pink: "hsl(var(--neon-pink))",
+          blue: "hsl(var(--neon-blue))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -82,14 +84,24 @@ export default {
           to: { height: "0" },
         },
         "glow-pulse": {
-          "0%, 100%": { opacity: "0.4" },
-          "50%": { opacity: "0.8" },
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "0.7" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        "neon-flicker": {
+          "0%, 19%, 21%, 23%, 25%, 54%, 56%, 100%": { opacity: "1" },
+          "20%, 24%, 55%": { opacity: "0.6" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
+        "float": "float 6s ease-in-out infinite",
+        "neon-flicker": "neon-flicker 3s linear infinite",
       },
     },
   },
