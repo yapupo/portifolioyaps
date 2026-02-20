@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import ProjectCard from "@/components/ProjectCard";
 import Navbar from "@/components/Navbar";
 import FloatingElements from "@/components/FloatingElements";
-import { Loader2, Code2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, FolderOpen, Brush, Mic } from "lucide-react";
 
 const Index = () => {
   const { data: projects, isLoading } = useQuery({
@@ -33,27 +33,30 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background bg-grid relative">
+    <div className="min-h-screen bg-deep-radial relative overflow-hidden">
+      <div className="absolute inset-0 bg-grid opacity-40" />
       <FloatingElements />
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-32 pb-8 px-6 relative z-10">
+      <section className="pt-36 pb-8 px-6 relative z-10">
         <div className="max-w-7xl mx-auto text-center">
           {/* Profile Photo */}
           {profile?.photo_url && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-6 flex justify-center"
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              className="mb-8 flex justify-center"
             >
               <div className="relative">
                 <img
                   src={profile.photo_url}
                   alt={profile.name || "Foto"}
-                  className="w-28 h-28 rounded-full object-cover border-2 border-neon-purple/40"
+                  className="w-32 h-32 rounded-full object-cover border-2 border-neon-purple/30"
                 />
-                <div className="absolute inset-0 rounded-full neon-glow-purple opacity-50" />
+                <div className="absolute inset-0 rounded-full neon-glow-purple opacity-40" />
+                <div className="absolute -inset-1 rounded-full border border-neon-cyan/10 animate-glow-pulse" />
               </div>
             </motion.div>
           )}
@@ -63,29 +66,35 @@ const Index = () => {
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-sm font-mono uppercase tracking-[0.3em] text-neon-cyan mb-4"
+              transition={{ delay: 0.1 }}
+              className="text-xs font-mono uppercase tracking-[0.4em] text-neon-cyan mb-6 icon-neon-cyan"
             >
               {profile.name}
             </motion.p>
           )}
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+          {/* Main Title with decorative neon icons */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-black tracking-tight mb-6 flex items-center justify-center gap-4"
+            transition={{ delay: 0.15 }}
+            className="flex items-center justify-center gap-5 mb-6"
           >
-            <Sparkles className="w-10 h-10 text-neon-purple hidden md:block" />
-            Meus{" "}
-            <span className="text-gradient">Projetos</span>
-            <Code2 className="w-10 h-10 text-neon-cyan hidden md:block" />
-          </motion.h1>
+            <FolderOpen className="w-10 h-10 text-neon-purple icon-neon-purple hidden md:block" />
+            <Brush className="w-8 h-8 text-neon-cyan icon-neon-cyan hidden lg:block" />
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight font-display">
+              <span className="text-gradient">Meus Projetos</span>
+            </h1>
+            <Mic className="w-8 h-8 text-neon-pink icon-neon-pink hidden lg:block" />
+            <Sparkles className="w-10 h-10 text-neon-cyan icon-neon-cyan hidden md:block" />
+          </motion.div>
 
           {/* Bio */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8"
+            transition={{ delay: 0.25 }}
+            className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             {profile?.bio || "Uma coleção dos meus trabalhos mais recentes em desenvolvimento web e design."}
           </motion.p>
@@ -94,72 +103,84 @@ const Index = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-center justify-center gap-8 text-sm"
+            transition={{ delay: 0.35 }}
+            className="flex items-center justify-center gap-4 md:gap-6 text-sm"
           >
-            <div className="glass-card rounded-full px-5 py-2 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-muted-foreground">Disponível para projetos</span>
+            <div className="glass-card-intense rounded-full px-5 py-2.5 flex items-center gap-2.5 hover:neon-glow-purple transition-shadow duration-300">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-glow-pulse" />
+              <span className="text-muted-foreground font-mono text-xs tracking-wide">Disponível para projetos</span>
             </div>
-            <div className="glass-card rounded-full px-5 py-2 hidden md:flex items-center gap-2">
-              <span className="text-neon-purple font-bold">{projects?.length || 0}</span>
-              <span className="text-muted-foreground">projetos</span>
+            <div className="glass-card-intense rounded-full px-5 py-2.5 hidden md:flex items-center gap-2.5 hover:neon-glow-cyan transition-shadow duration-300">
+              <span className="text-neon-cyan font-bold font-display">{projects?.length || 0}</span>
+              <span className="text-muted-foreground font-mono text-xs tracking-wide">projetos</span>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Projects Grid */}
-      <section className="px-6 pb-20 pt-12 relative z-10">
+      <section className="px-6 pb-24 pt-16 relative z-10">
         <div className="max-w-7xl mx-auto">
           {/* Section label */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex items-center gap-3 mb-8"
+            transition={{ delay: 0.4 }}
+            className="flex items-center gap-3 mb-10"
           >
-            <div className="h-px flex-1 max-w-[60px] bg-gradient-to-r from-neon-purple to-transparent" />
-            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Trabalhos Recentes</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+            <div className="h-[2px] w-16 bg-gradient-to-r from-neon-purple via-neon-cyan to-transparent rounded-full" />
+            <span className="text-xs font-mono uppercase tracking-[0.3em] text-muted-foreground">
+              Trabalhos Recentes
+            </span>
+            <div className="h-px flex-1 bg-gradient-to-r from-border/40 to-transparent" />
           </motion.div>
 
           {isLoading ? (
-            <div className="flex justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-neon-purple" />
+            <div className="flex justify-center py-24">
+              <div className="relative">
+                <Loader2 className="w-10 h-10 animate-spin text-neon-purple icon-neon-purple" />
+                <div className="absolute inset-0 neon-glow-purple rounded-full opacity-30" />
+              </div>
             </div>
           ) : projects && projects.length > 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              transition={{ delay: 0.4 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7"
             >
               {projects.map((project, i) => (
                 <motion.div
                   key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.1 }}
+                  transition={{ delay: 0.4 + i * 0.12 }}
                 >
                   <ProjectCard {...project} />
                 </motion.div>
               ))}
             </motion.div>
           ) : (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground">Nenhum projeto encontrado. Adicione pelo painel Admin.</p>
+            <div className="text-center py-24">
+              <div className="glass-card-intense rounded-xl p-10 max-w-md mx-auto">
+                <FolderOpen className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4 icon-neon-purple" />
+                <p className="text-muted-foreground font-mono text-sm">
+                  Nenhum projeto encontrado. Adicione pelo painel Admin.
+                </p>
+              </div>
             </div>
           )}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-border/30 py-8 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} {profile?.name || "Portfólio"}. Feito com 💜
+      <footer className="relative z-10 border-t border-border/20 py-8 px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-3">
+          <div className="h-px w-12 bg-gradient-to-r from-transparent to-neon-purple/30" />
+          <p className="text-xs text-muted-foreground font-mono tracking-wider">
+            © {new Date().getFullYear()} {profile?.name || "Portfólio"} — Feito com 💜
           </p>
+          <div className="h-px w-12 bg-gradient-to-l from-transparent to-neon-cyan/30" />
         </div>
       </footer>
     </div>
