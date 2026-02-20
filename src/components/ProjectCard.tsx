@@ -1,5 +1,6 @@
+import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Code2, Database, Globe, Palette, Terminal, Cpu, Layers, Braces, FileCode } from "lucide-react";
+import { ExternalLink, Code2, Database, Globe, Palette, Terminal, Cpu, Layers, Braces, FileCode, ChevronLeft, ChevronRight } from "lucide-react";
 
 const techIcons = [
   { icon: Code2, label: "HTML5", color: "text-orange-400" },
@@ -37,6 +38,27 @@ interface ProjectCardProps {
 
 const ProjectCard = ({ name, description, link, image_url }: ProjectCardProps) => {
   const techs = getRandomTechs(name);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 1);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = scrollRef.current;
+    if (el) el.addEventListener("scroll", checkScroll, { passive: true });
+    return () => el?.removeEventListener("scroll", checkScroll);
+  }, [checkScroll]);
+
+  const scroll = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "left" ? -120 : 120, behavior: "smooth" });
+  };
 
   return (
     <motion.div
@@ -81,8 +103,19 @@ const ProjectCard = ({ name, description, link, image_url }: ProjectCardProps) =
         )}
 
         {/* Tech Dock */}
-        <div className="rounded-lg bg-background/60 border border-border/30 p-2.5 mb-4 shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)]">
-          <div className="flex items-center gap-2 overflow-x-auto">
+        <div className="rounded-lg bg-background/60 border border-border/30 p-2 mb-4 shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)] relative flex items-center gap-1">
+          {canScrollLeft && (
+            <button
+              onClick={() => scroll("left")}
+              className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-secondary/60 text-muted-foreground hover:text-neon-cyan hover:drop-shadow-[0_0_6px_hsl(var(--neon-cyan)/0.6)] transition-all duration-300"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <div
+            ref={scrollRef}
+            className="flex items-center gap-2 overflow-x-auto scrollbar-none"
+          >
             {techs.map((tech) => {
               const Icon = tech.icon;
               return (
@@ -100,6 +133,14 @@ const ProjectCard = ({ name, description, link, image_url }: ProjectCardProps) =
               );
             })}
           </div>
+          {canScrollRight && (
+            <button
+              onClick={() => scroll("right")}
+              className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-secondary/60 text-muted-foreground hover:text-neon-cyan hover:drop-shadow-[0_0_6px_hsl(var(--neon-cyan)/0.6)] transition-all duration-300"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         {link && (
