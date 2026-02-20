@@ -80,24 +80,26 @@ const ProjectCard = ({ name, description, link, image_url }: ProjectCardProps) =
           </p>
         )}
 
-        {/* Tech badges */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {techs.map((tech, i) => {
-            const Icon = tech.icon;
-            return (
-              <motion.div
-                key={tech.label}
-                initial={{ opacity: 0.7 }}
-                whileHover={{ scale: 1.15, opacity: 1 }}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/60 border border-border/40 group-hover:border-neon-purple/20 transition-all duration-300"
-              >
-                <Icon className={`w-3.5 h-3.5 ${tech.color} transition-all duration-300 group-hover:drop-shadow-[0_0_4px_currentColor]`} />
-                <span className="text-[10px] font-mono text-muted-foreground group-hover:text-foreground/80 transition-colors uppercase tracking-wider">
-                  {tech.label}
-                </span>
-              </motion.div>
-            );
-          })}
+        {/* Tech Dock */}
+        <div className="rounded-lg bg-background/60 border border-border/30 p-2.5 mb-4 shadow-[inset_0_2px_8px_rgba(0,0,0,0.4)]">
+          <div className="flex items-center gap-2 overflow-x-auto">
+            {techs.map((tech) => {
+              const Icon = tech.icon;
+              return (
+                <motion.div
+                  key={tech.label}
+                  initial={{ opacity: 0.8 }}
+                  whileHover={{ scale: 1.12, opacity: 1 }}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/70 border border-border/30 group-hover:border-neon-purple/25 transition-all duration-300 shrink-0"
+                >
+                  <Icon className={`w-3.5 h-3.5 ${tech.color} transition-all duration-300 group-hover:drop-shadow-[0_0_5px_currentColor]`} />
+                  <span className="text-[10px] font-mono text-muted-foreground group-hover:text-foreground/80 transition-colors uppercase tracking-wider">
+                    {tech.label}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
         {link && (
