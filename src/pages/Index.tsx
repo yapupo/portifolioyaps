@@ -177,6 +177,14 @@ const Index = () => {
       <footer className="relative z-10 border-t border-border/20 py-8 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-3">
           <div className="h-px w-12 bg-gradient-to-r from-transparent to-neon-purple/30" />
+            <a 
+              href="https://wa.me/5585999999999" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="botao-zap"
+            >
+              Falar no Zap
+            </a>
           <p className="text-xs text-muted-foreground font-mono tracking-wider">
             © {new Date().getFullYear()} {profile?.name || "Portfólio"} — Feito com 💜
           </p>
