@@ -178,7 +178,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-3">
           <div className="h-px w-12 bg-gradient-to-r from-transparent to-neon-purple/30" />
             <a 
-              href="https://wa.me/5585999999999" 
+              href="https://wa.me/5585992283391" 
               target="_blank" 
               rel="noopener noreferrer"
               className="botao-zap"
