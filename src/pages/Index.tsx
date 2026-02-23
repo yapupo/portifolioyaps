@@ -185,7 +185,6 @@ const Index = () => {
             >
               Falar no Zap
             </a>
-          <br>
           <p className="text-xs text-muted-foreground font-mono tracking-wider">
             © {new Date().getFullYear()} {profile?.name || "Portfólio"} — Feito com 💜
           </p>
