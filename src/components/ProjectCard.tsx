@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Code2, Database, Globe, Palette, Terminal, Cpu, Layers, Braces, FileCode, ChevronLeft, ChevronRight } from "lucide-react";
+import { ExternalLink, Code2, Database, Globe, Palette, Terminal, Cpu, Layers, Braces, FileCode, ChevronLeft, ChevronRight, Github, Rocket } from "lucide-react";
 
 const techIcons = [
   { icon: Code2, label: "HTML5", color: "text-orange-400" },
@@ -14,7 +14,6 @@ const techIcons = [
   { icon: FileCode, label: "TypeScript", color: "text-blue-500" },
 ];
 
-// Pick random 3-5 tech icons per card for visual variety
 const getRandomTechs = (seed: string) => {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
@@ -34,9 +33,11 @@ interface ProjectCardProps {
   description: string | null;
   link: string | null;
   image_url: string | null;
+  repo_url?: string | null;
+  deploy_url?: string | null;
 }
 
-const ProjectCard = ({ name, description, link, image_url }: ProjectCardProps) => {
+const ProjectCard = ({ name, description, link, image_url, repo_url, deploy_url }: ProjectCardProps) => {
   const techs = getRandomTechs(name);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -59,6 +60,8 @@ const ProjectCard = ({ name, description, link, image_url }: ProjectCardProps) =
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -120 : 120, behavior: "smooth" });
   };
+
+  const hasAnyLink = link || repo_url || deploy_url;
 
   return (
     <motion.div
@@ -86,8 +89,6 @@ const ProjectCard = ({ name, description, link, image_url }: ProjectCardProps) =
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-
-        {/* Hover overlay glow */}
         <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/10 to-neon-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       </div>
 
@@ -143,23 +144,37 @@ const ProjectCard = ({ name, description, link, image_url }: ProjectCardProps) =
           )}
         </div>
 
-        {link && (
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-neon-cyan hover:text-neon-purple transition-colors duration-300 group/link"
-          >
-            <ExternalLink className="w-4 h-4 transition-transform group-hover/link:translate-x-0.5" />
-            <span>Visitar Projeto</span>
-          </a>
+        {/* Action Links */}
+        {hasAnyLink && (
+          <div className="flex items-center gap-3 flex-wrap">
+            {repo_url && (
+              <a
+                href={repo_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-border/40 bg-secondary/50 text-muted-foreground hover:text-neon-cyan hover:border-neon-cyan/40 transition-all duration-300"
+              >
+                <Github className="w-3.5 h-3.5" />
+                <span>Repositório</span>
+              </a>
+            )}
+            {(deploy_url || link) && (
+              <a
+                href={deploy_url || link!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-neon-purple/30 bg-neon-purple/10 text-neon-cyan hover:text-neon-purple hover:border-neon-purple/50 transition-all duration-300"
+              >
+                <Rocket className="w-3.5 h-3.5" />
+                <span>Site Vivo</span>
+              </a>
+            )}
+          </div>
         )}
       </div>
 
       {/* Neon border glow on hover */}
       <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none border border-neon-purple/30" />
-
-      {/* Bottom neon line */}
       <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-cyan/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
     </motion.div>
   );

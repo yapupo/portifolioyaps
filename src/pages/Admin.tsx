@@ -25,11 +25,16 @@ const Admin = () => {
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [repoUrl, setRepoUrl] = useState("");
+  const [deployUrl, setDeployUrl] = useState("");
 
   // Profile form
   const [profileName, setProfileName] = useState("");
   const [profileBio, setProfileBio] = useState("");
   const [profilePhoto, setProfilePhoto] = useState("");
+  const [profileGithub, setProfileGithub] = useState("");
+  const [profileLinkedin, setProfileLinkedin] = useState("");
+  const [profileWhatsapp, setProfileWhatsapp] = useState("");
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -61,6 +66,9 @@ const Admin = () => {
         setProfileName(data.name || "");
         setProfileBio(data.bio || "");
         setProfilePhoto(data.photo_url || "");
+        setProfileGithub(data.github_url || "");
+        setProfileLinkedin(data.linkedin_url || "");
+        setProfileWhatsapp(data.whatsapp || "");
       }
       return data;
     },
@@ -68,13 +76,20 @@ const Admin = () => {
 
   const addProject = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("projects").insert({ name, description, link, image_url: imageUrl });
+      const { error } = await supabase.from("projects").insert({
+        name,
+        description,
+        link,
+        image_url: imageUrl,
+        repo_url: repoUrl || null,
+        deploy_url: deployUrl || null,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      setName(""); setDescription(""); setLink(""); setImageUrl("");
+      setName(""); setDescription(""); setLink(""); setImageUrl(""); setRepoUrl(""); setDeployUrl("");
       toast({ title: "Projeto adicionado!" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
@@ -100,6 +115,9 @@ const Admin = () => {
         name: profileName,
         bio: profileBio,
         photo_url: profilePhoto,
+        github_url: profileGithub,
+        linkedin_url: profileLinkedin,
+        whatsapp: profileWhatsapp,
       }).eq("id", profile.id);
       if (error) throw error;
     },
@@ -184,7 +202,6 @@ const Admin = () => {
             <User className="w-5 h-5 text-neon-purple" /> Meu Perfil
           </h2>
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Photo preview */}
             <div className="flex flex-col items-center gap-3">
               <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border/50 bg-secondary/50 flex items-center justify-center">
                 {profilePhoto ? (
@@ -198,6 +215,9 @@ const Admin = () => {
               <Input placeholder="Seu Nome" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="bg-secondary/50 border-border/50" />
               <Input placeholder="URL da Foto de Perfil" value={profilePhoto} onChange={(e) => setProfilePhoto(e.target.value)} className="bg-secondary/50 border-border/50" />
               <Textarea placeholder="Sua biografia..." value={profileBio} onChange={(e) => setProfileBio(e.target.value)} className="bg-secondary/50 border-border/50" rows={3} />
+              <Input placeholder="GitHub URL (ex: https://github.com/user)" value={profileGithub} onChange={(e) => setProfileGithub(e.target.value)} className="bg-secondary/50 border-border/50" />
+              <Input placeholder="LinkedIn URL (ex: https://linkedin.com/in/user)" value={profileLinkedin} onChange={(e) => setProfileLinkedin(e.target.value)} className="bg-secondary/50 border-border/50" />
+              <Input placeholder="WhatsApp (ex: 5585992283391)" value={profileWhatsapp} onChange={(e) => setProfileWhatsapp(e.target.value)} className="bg-secondary/50 border-border/50" />
               <Button
                 onClick={() => updateProfile.mutate()}
                 disabled={updateProfile.isPending}
@@ -218,6 +238,8 @@ const Admin = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input placeholder="Nome do Projeto" value={name} onChange={(e) => setName(e.target.value)} className="bg-secondary/50 border-border/50" />
             <Input placeholder="Link do Site" value={link} onChange={(e) => setLink(e.target.value)} className="bg-secondary/50 border-border/50" />
+            <Input placeholder="URL do Repositório (GitHub)" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} className="bg-secondary/50 border-border/50" />
+            <Input placeholder="URL do Deploy (Site Vivo)" value={deployUrl} onChange={(e) => setDeployUrl(e.target.value)} className="bg-secondary/50 border-border/50" />
             <Input placeholder="URL da Imagem de Capa" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="bg-secondary/50 border-border/50 md:col-span-2" />
             <Textarea placeholder="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} className="bg-secondary/50 border-border/50 md:col-span-2" rows={3} />
           </div>

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import ProjectCard from "@/components/ProjectCard";
 import Navbar from "@/components/Navbar";
 import FloatingElements from "@/components/FloatingElements";
-import { Loader2, Sparkles, FolderOpen, Brush, Mic } from "lucide-react";
+import { Loader2, Sparkles, FolderOpen, Brush, Mic, Github, Linkedin, MessageCircle } from "lucide-react";
 
 const Index = () => {
   const { data: projects, isLoading } = useQuery({
@@ -32,14 +32,20 @@ const Index = () => {
     },
   });
 
+  const socialLinks = [
+    { icon: Github, href: profile?.github_url, label: "GitHub" },
+    { icon: Linkedin, href: profile?.linkedin_url, label: "LinkedIn" },
+    { icon: MessageCircle, href: profile?.whatsapp ? `https://wa.me/${profile.whatsapp.replace(/\D/g, "")}` : null, label: "WhatsApp" },
+  ].filter((s) => s.href);
+
   return (
-    <div className="min-h-screen bg-deep-radial relative overflow-hidden">
+    <div className="min-h-screen bg-deep-radial relative overflow-hidden scroll-smooth">
       <div className="absolute inset-0 bg-grid opacity-40" />
       <FloatingElements />
       <Navbar />
 
-      {/* Hero */}
-      <section className="pt-36 pb-8 px-6 relative z-10">
+      {/* Hero / Sobre */}
+      <section id="sobre" className="pt-36 pb-8 px-6 relative z-10">
         <div className="max-w-7xl mx-auto text-center">
           {/* Profile Photo */}
           {profile?.photo_url && (
@@ -73,7 +79,7 @@ const Index = () => {
             </motion.p>
           )}
 
-          {/* Main Title with decorative neon icons */}
+          {/* Main Title */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -94,10 +100,36 @@ const Index = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6 leading-relaxed"
           >
             {profile?.bio || "Uma coleção dos meus trabalhos mais recentes em desenvolvimento web e design."}
           </motion.p>
+
+          {/* Social Links */}
+          {socialLinks.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="flex items-center justify-center gap-3 mb-10"
+            >
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.label}
+                    href={social.href!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-lg glass-card-intense flex items-center justify-center text-muted-foreground hover:text-neon-cyan hover:neon-glow-cyan transition-all duration-300"
+                    aria-label={social.label}
+                  >
+                    <Icon className="w-[1.1em] h-[1.1em]" />
+                  </a>
+                );
+              })}
+            </motion.div>
+          )}
 
           {/* Stats bar */}
           <motion.div
@@ -119,9 +151,8 @@ const Index = () => {
       </section>
 
       {/* Projects Grid */}
-      <section className="px-6 pb-24 pt-16 relative z-10">
+      <section id="projetos" className="px-6 pb-24 pt-16 relative z-10">
         <div className="max-w-7xl mx-auto">
-          {/* Section label */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -156,7 +187,14 @@ const Index = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + i * 0.12 }}
                 >
-                  <ProjectCard {...project} />
+                  <ProjectCard
+                    name={project.name}
+                    description={project.description}
+                    link={project.link}
+                    image_url={project.image_url}
+                    repo_url={project.repo_url}
+                    deploy_url={project.deploy_url}
+                  />
                 </motion.div>
               ))}
             </motion.div>
@@ -173,22 +211,47 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-border/20 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-3">
-          <div className="h-px w-12 bg-gradient-to-r from-transparent to-neon-purple/30" />
-            <a 
-              href="https://wa.me/5585992283391" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="botao-zap"
-            >
-              Falar no Zap
-            </a>
-          <p className="text-xs text-muted-foreground font-mono tracking-wider">
-            © {new Date().getFullYear()} {profile?.name || "Portfólio"} — Feito com 💜
-          </p>
-          <div className="h-px w-12 bg-gradient-to-l from-transparent to-neon-cyan/30" />
+      {/* Footer / Contato */}
+      <footer id="contato" className="relative z-10 border-t border-border/20 py-8 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col items-center gap-4">
+          {/* Social icons in footer */}
+          {socialLinks.length > 0 && (
+            <div className="flex items-center gap-3">
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.label}
+                    href={social.href!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-lg glass-card flex items-center justify-center text-muted-foreground hover:text-neon-cyan hover:neon-glow-cyan transition-all duration-300"
+                    aria-label={social.label}
+                  >
+                    <Icon className="w-[1em] h-[1em]" />
+                  </a>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-neon-purple/30" />
+            {profile?.whatsapp && (
+              <a
+                href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="botao-zap"
+              >
+                Falar no Zap
+              </a>
+            )}
+            <p className="text-xs text-muted-foreground font-mono tracking-wider">
+              © {new Date().getFullYear()} {profile?.name || "Portfólio"} — Feito com 💜
+            </p>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-neon-cyan/30" />
+          </div>
         </div>
       </footer>
     </div>

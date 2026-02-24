@@ -17,51 +17,66 @@ export type Database = {
       projects: {
         Row: {
           created_at: string
+          deploy_url: string | null
           description: string | null
           id: string
           image_url: string | null
           link: string | null
           name: string
+          repo_url: string | null
         }
         Insert: {
           created_at?: string
+          deploy_url?: string | null
           description?: string | null
           id?: string
           image_url?: string | null
           link?: string | null
           name: string
+          repo_url?: string | null
         }
         Update: {
           created_at?: string
+          deploy_url?: string | null
           description?: string | null
           id?: string
           image_url?: string | null
           link?: string | null
           name?: string
+          repo_url?: string | null
         }
         Relationships: []
       }
       site_profile: {
         Row: {
           bio: string | null
+          github_url: string | null
           id: string
+          linkedin_url: string | null
           name: string
           photo_url: string | null
           updated_at: string
+          whatsapp: string | null
         }
         Insert: {
           bio?: string | null
+          github_url?: string | null
           id?: string
+          linkedin_url?: string | null
           name?: string
           photo_url?: string | null
           updated_at?: string
+          whatsapp?: string | null
         }
         Update: {
           bio?: string | null
+          github_url?: string | null
           id?: string
+          linkedin_url?: string | null
           name?: string
           photo_url?: string | null
           updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
