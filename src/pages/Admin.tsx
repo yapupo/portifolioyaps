@@ -29,6 +29,25 @@ const Admin = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [repoUrl, setRepoUrl] = useState("");
   const [deployUrl, setDeployUrl] = useState("");
+  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
+  const [customTech, setCustomTech] = useState("");
+
+  const toggleTech = (label: string) => {
+    setSelectedTechs((prev) =>
+      prev.includes(label) ? prev.filter((t) => t !== label) : [...prev, label]
+    );
+  };
+  const addCustomTech = () => {
+    const v = customTech.trim();
+    if (!v) return;
+    if (!selectedTechs.some((t) => t.toLowerCase() === v.toLowerCase())) {
+      setSelectedTechs((prev) => [...prev, v]);
+    }
+    setCustomTech("");
+  };
+  const removeTech = (label: string) => {
+    setSelectedTechs((prev) => prev.filter((t) => t !== label));
+  };
 
   // Profile form
   const [profileName, setProfileName] = useState("");
@@ -119,13 +138,14 @@ const Admin = () => {
         image_url: imageUrl,
         repo_url: repoUrl || null,
         deploy_url: deployUrl || null,
+        technologies: selectedTechs,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      setName(""); setDescription(""); setLink(""); setImageUrl(""); setRepoUrl(""); setDeployUrl("");
+      setName(""); setDescription(""); setLink(""); setImageUrl(""); setRepoUrl(""); setDeployUrl(""); setSelectedTechs([]); setCustomTech("");
       toast({ title: "Projeto adicionado!" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
