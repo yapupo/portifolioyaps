@@ -274,7 +274,27 @@ const Admin = () => {
             <Input placeholder="Link do Site" value={link} onChange={(e) => setLink(e.target.value)} className="bg-secondary/50 border-border/50" />
             <Input placeholder="URL do Repositório (GitHub)" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} className="bg-secondary/50 border-border/50" />
             <Input placeholder="URL do Deploy (Site Vivo)" value={deployUrl} onChange={(e) => setDeployUrl(e.target.value)} className="bg-secondary/50 border-border/50" />
-            <Input placeholder="URL da Imagem de Capa" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="bg-secondary/50 border-border/50 md:col-span-2" />
+            <div className="md:col-span-2 space-y-2">
+              <Input placeholder="URL da Imagem de Capa (ou faça upload abaixo)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="bg-secondary/50 border-border/50" />
+              <div className="flex items-center gap-3">
+                <label className="flex-1">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border border-dashed border-neon-cyan/40 bg-secondary/30 text-sm text-muted-foreground hover:text-neon-cyan hover:border-neon-cyan/70 transition-colors cursor-pointer ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    {uploading ? "Enviando..." : "Upload de imagem (PNG, JPG, WEBP — máx. 5MB)"}
+                  </div>
+                </label>
+                {imageUrl && (
+                  <img src={imageUrl} alt="Preview" className="w-12 h-12 rounded-md object-cover border border-border/50" />
+                )}
+              </div>
+            </div>
             <Textarea placeholder="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} className="bg-secondary/50 border-border/50 md:col-span-2" rows={3} />
           </div>
           <Button
