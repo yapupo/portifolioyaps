@@ -421,6 +421,18 @@ const Admin = () => {
           )}
         </motion.div>
       </div>
+
+      {(() => {
+        const editing = projects?.find((p) => p.id === editingProjectId);
+        if (!editing) return null;
+        return (
+          <EditProjectDialog
+            project={editing}
+            open={!!editingProjectId}
+            onOpenChange={(o) => !o && setEditingProjectId(null)}
+          />
+        );
+      })()}
     </div>
   );
 };
