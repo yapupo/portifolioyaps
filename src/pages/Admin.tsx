@@ -35,6 +35,40 @@ const Admin = () => {
   const [profileGithub, setProfileGithub] = useState("");
   const [profileLinkedin, setProfileLinkedin] = useState("");
   const [profileWhatsapp, setProfileWhatsapp] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Arquivo inválido", description: "Envie uma imagem (PNG, JPG, etc).", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Arquivo muito grande", description: "Máximo 5MB.", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("project-images").upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type,
+      });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from("project-images").getPublicUrl(path);
+      setImageUrl(data.publicUrl);
+      toast({ title: "Imagem enviada!", description: "URL preenchida automaticamente." });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha no upload";
+      toast({ title: "Erro no upload", description: msg, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
