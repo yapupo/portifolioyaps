@@ -1,18 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Code2, Database, Globe, Palette, Terminal, Cpu, Layers, Braces, FileCode, ChevronLeft, ChevronRight, Github, Rocket } from "lucide-react";
-
-const techIcons = [
-  { icon: Code2, label: "HTML5", color: "text-orange-400" },
-  { icon: Palette, label: "CSS3", color: "text-blue-400" },
-  { icon: Braces, label: "JavaScript", color: "text-yellow-400" },
-  { icon: Terminal, label: "Python", color: "text-green-400" },
-  { icon: Database, label: "SQL", color: "text-neon-cyan" },
-  { icon: Layers, label: "React", color: "text-neon-cyan" },
-  { icon: Globe, label: "Web", color: "text-neon-purple" },
-  { icon: Cpu, label: "Node.js", color: "text-green-500" },
-  { icon: FileCode, label: "TypeScript", color: "text-blue-500" },
-];
+import { Code2, ChevronLeft, ChevronRight, Github, Rocket } from "lucide-react";
+import { getTechDef, PREDEFINED_TECHS } from "@/lib/technologies";
 
 const getRandomTechs = (seed: string) => {
   let hash = 0;
@@ -20,7 +9,7 @@ const getRandomTechs = (seed: string) => {
     hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   }
   const count = 3 + (Math.abs(hash) % 3);
-  const shuffled = [...techIcons].sort((a, b) => {
+  const shuffled = [...PREDEFINED_TECHS].sort((a, b) => {
     const ha = a.label.charCodeAt(0) + hash;
     const hb = b.label.charCodeAt(0) + hash;
     return (ha % 7) - (hb % 7);
@@ -35,10 +24,13 @@ interface ProjectCardProps {
   image_url: string | null;
   repo_url?: string | null;
   deploy_url?: string | null;
+  technologies?: string[] | null;
 }
 
-const ProjectCard = ({ name, description, link, image_url, repo_url, deploy_url }: ProjectCardProps) => {
-  const techs = getRandomTechs(name);
+const ProjectCard = ({ name, description, link, image_url, repo_url, deploy_url, technologies }: ProjectCardProps) => {
+  const techs = technologies && technologies.length > 0
+    ? technologies.map(getTechDef)
+    : getRandomTechs(name);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
