@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save, Upload } from "lucide-react";
+import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save, Upload, X } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Session } from "@supabase/supabase-js";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PREDEFINED_TECHS } from "@/lib/technologies";
 
 const Admin = () => {
   const queryClient = useQueryClient();
