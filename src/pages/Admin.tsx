@@ -6,16 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save, Upload, X } from "lucide-react";
+import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save, Upload, X, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Session } from "@supabase/supabase-js";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PREDEFINED_TECHS } from "@/lib/technologies";
+import EditProjectDialog from "@/components/EditProjectDialog";
 
 const Admin = () => {
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
 
   // Auth form
   const [email, setEmail] = useState("");
@@ -393,13 +395,24 @@ const Admin = () => {
                       <p className="text-sm text-muted-foreground truncate">{p.description}</p>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost" size="icon"
-                    onClick={() => deleteProject.mutate(p.id)}
-                    className="text-destructive hover:text-destructive/80 flex-shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <Button
+                      variant="ghost" size="icon"
+                      onClick={() => setEditingProjectId(p.id)}
+                      className="text-muted-foreground hover:text-neon-cyan"
+                      aria-label="Editar projeto"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost" size="icon"
+                      onClick={() => deleteProject.mutate(p.id)}
+                      className="text-destructive hover:text-destructive/80"
+                      aria-label="Excluir projeto"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
