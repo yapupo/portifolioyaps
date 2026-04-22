@@ -24,6 +24,7 @@ export type Database = {
           link: string | null
           name: string
           repo_url: string | null
+          technologies: string[]
         }
         Insert: {
           created_at?: string
@@ -34,6 +35,7 @@ export type Database = {
           link?: string | null
           name: string
           repo_url?: string | null
+          technologies?: string[]
         }
         Update: {
           created_at?: string
@@ -44,6 +46,7 @@ export type Database = {
           link?: string | null
           name?: string
           repo_url?: string | null
+          technologies?: string[]
         }
         Relationships: []
       }

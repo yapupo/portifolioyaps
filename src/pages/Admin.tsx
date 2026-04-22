@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save, Upload } from "lucide-react";
+import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save, Upload, X } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Session } from "@supabase/supabase-js";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PREDEFINED_TECHS } from "@/lib/technologies";
 
 const Admin = () => {
   const queryClient = useQueryClient();
@@ -27,6 +29,25 @@ const Admin = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [repoUrl, setRepoUrl] = useState("");
   const [deployUrl, setDeployUrl] = useState("");
+  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
+  const [customTech, setCustomTech] = useState("");
+
+  const toggleTech = (label: string) => {
+    setSelectedTechs((prev) =>
+      prev.includes(label) ? prev.filter((t) => t !== label) : [...prev, label]
+    );
+  };
+  const addCustomTech = () => {
+    const v = customTech.trim();
+    if (!v) return;
+    if (!selectedTechs.some((t) => t.toLowerCase() === v.toLowerCase())) {
+      setSelectedTechs((prev) => [...prev, v]);
+    }
+    setCustomTech("");
+  };
+  const removeTech = (label: string) => {
+    setSelectedTechs((prev) => prev.filter((t) => t !== label));
+  };
 
   // Profile form
   const [profileName, setProfileName] = useState("");
@@ -117,13 +138,14 @@ const Admin = () => {
         image_url: imageUrl,
         repo_url: repoUrl || null,
         deploy_url: deployUrl || null,
+        technologies: selectedTechs,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      setName(""); setDescription(""); setLink(""); setImageUrl(""); setRepoUrl(""); setDeployUrl("");
+      setName(""); setDescription(""); setLink(""); setImageUrl(""); setRepoUrl(""); setDeployUrl(""); setSelectedTechs([]); setCustomTech("");
       toast({ title: "Projeto adicionado!" });
     },
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
@@ -296,6 +318,50 @@ const Admin = () => {
               </div>
             </div>
             <Textarea placeholder="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} className="bg-secondary/50 border-border/50 md:col-span-2" rows={3} />
+
+            {/* Technologies */}
+            <div className="md:col-span-2 space-y-3">
+              <p className="text-sm font-semibold text-foreground/90 font-display tracking-wide">Tecnologias usadas</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 rounded-lg bg-background/40 border border-border/30">
+                {PREDEFINED_TECHS.map((t) => {
+                  const checked = selectedTechs.some((s) => s.toLowerCase() === t.label.toLowerCase());
+                  const Icon = t.icon;
+                  return (
+                    <label key={t.label} className="flex items-center gap-2 cursor-pointer group">
+                      <Checkbox checked={checked} onCheckedChange={() => toggleTech(t.label)} />
+                      <Icon className={`w-3.5 h-3.5 ${t.color}`} />
+                      <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{t.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="Adicionar tecnologia personalizada (ex: Rust)"
+                  value={customTech}
+                  onChange={(e) => setCustomTech(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomTech(); } }}
+                  className="bg-secondary/50 border-border/50"
+                />
+                <Button type="button" onClick={addCustomTech} variant="outline" className="border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {selectedTechs.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {selectedTechs.map((t) => (
+                    <span key={t} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-purple/10 border border-neon-purple/30 text-xs text-foreground">
+                      {t}
+                      <button type="button" onClick={() => removeTech(t)} className="text-muted-foreground hover:text-destructive transition-colors">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <Button
             onClick={() => addProject.mutate()}
