@@ -194,6 +194,7 @@ const Index = () => {
                     image_url={project.image_url}
                     repo_url={project.repo_url}
                     deploy_url={project.deploy_url}
+                    technologies={project.technologies}
                   />
                 </motion.div>
               ))}
