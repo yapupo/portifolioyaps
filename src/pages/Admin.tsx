@@ -182,14 +182,12 @@ const Admin = () => {
     <div className="min-h-screen bg-background bg-grid">
       <Navbar />
       <div className="pt-32 px-6 max-w-4xl mx-auto pb-20">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8">
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-bold text-gradient">
             Painel Admin
           </motion.h1>
-          <Button variant="outline" size="sm" onClick={handleLogout} className="border-border/50 text-muted-foreground hover:text-foreground">
-            <LogOut className="w-4 h-4 mr-2" /> Sair
-          </Button>
         </div>
+
 
         {/* Profile Section */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-6 mb-8">
