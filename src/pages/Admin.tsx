@@ -175,60 +175,8 @@ const Admin = () => {
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
-      toast({ title: "Conta criada! Verifique seu e-mail para confirmar." });
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
-      toast({ title: "Login realizado!" });
-    }
-  };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({ title: "Logout realizado." });
-  };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-neon-purple" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-background bg-grid">
-        <Navbar />
-        <div className="pt-32 px-6 max-w-md mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-8">
-            <h2 className="text-2xl font-bold text-gradient mb-6 text-center">
-              {isSignUp ? "Criar Conta" : "Login Admin"}
-            </h2>
-            <form onSubmit={handleAuth} className="space-y-4">
-              <Input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-secondary/50 border-border/50" />
-              <Input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary/50 border-border/50" />
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/80 text-primary-foreground">
-                <LogIn className="w-4 h-4 mr-2" />
-                {isSignUp ? "Criar Conta" : "Entrar"}
-              </Button>
-            </form>
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="w-full mt-4 text-sm text-muted-foreground hover:text-neon-cyan transition-colors text-center"
-            >
-              {isSignUp ? "Já tem conta? Faça login" : "Não tem conta? Criar uma"}
-            </button>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background bg-grid">
