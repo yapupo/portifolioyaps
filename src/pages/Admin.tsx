@@ -15,9 +15,8 @@ import EditProjectDialog from "@/components/EditProjectDialog";
 
 const Admin = () => {
   const queryClient = useQueryClient();
-  const [session, setSession] = useState<Session | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+
 
   // Auth form
   const [email, setEmail] = useState("");
