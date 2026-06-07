@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -6,23 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save, Upload, X, Pencil } from "lucide-react";
+import { Loader2, Plus, Trash2, User, Save, Upload, X, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Session } from "@supabase/supabase-js";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { PREDEFINED_TECHS } from "@/lib/technologies";
 import EditProjectDialog from "@/components/EditProjectDialog";
 
 const Admin = () => {
   const queryClient = useQueryClient();
-  const [session, setSession] = useState<Session | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
 
+
   // Auth form
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
+
+
 
   // Project form
   const [name, setName] = useState("");
@@ -93,17 +91,8 @@ const Admin = () => {
     }
   };
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setAuthLoading(false);
-    });
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setAuthLoading(false);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
+
+
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ["admin-projects"],
@@ -186,73 +175,19 @@ const Admin = () => {
     onError: (e: Error) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
-      toast({ title: "Conta criada! Verifique seu e-mail para confirmar." });
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return toast({ title: "Erro", description: error.message, variant: "destructive" });
-      toast({ title: "Login realizado!" });
-    }
-  };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({ title: "Logout realizado." });
-  };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-neon-purple" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-background bg-grid">
-        <Navbar />
-        <div className="pt-32 px-6 max-w-md mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-8">
-            <h2 className="text-2xl font-bold text-gradient mb-6 text-center">
-              {isSignUp ? "Criar Conta" : "Login Admin"}
-            </h2>
-            <form onSubmit={handleAuth} className="space-y-4">
-              <Input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-secondary/50 border-border/50" />
-              <Input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-secondary/50 border-border/50" />
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/80 text-primary-foreground">
-                <LogIn className="w-4 h-4 mr-2" />
-                {isSignUp ? "Criar Conta" : "Entrar"}
-              </Button>
-            </form>
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="w-full mt-4 text-sm text-muted-foreground hover:text-neon-cyan transition-colors text-center"
-            >
-              {isSignUp ? "Já tem conta? Faça login" : "Não tem conta? Criar uma"}
-            </button>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background bg-grid">
       <Navbar />
       <div className="pt-32 px-6 max-w-4xl mx-auto pb-20">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8">
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-bold text-gradient">
             Painel Admin
           </motion.h1>
-          <Button variant="outline" size="sm" onClick={handleLogout} className="border-border/50 text-muted-foreground hover:text-foreground">
-            <LogOut className="w-4 h-4 mr-2" /> Sair
-          </Button>
         </div>
+
 
         {/* Profile Section */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-6 mb-8">
