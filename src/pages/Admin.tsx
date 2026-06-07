@@ -91,17 +91,8 @@ const Admin = () => {
     }
   };
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setAuthLoading(false);
-    });
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setAuthLoading(false);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
+
+
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ["admin-projects"],
