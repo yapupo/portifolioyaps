@@ -19,9 +19,8 @@ const Admin = () => {
 
 
   // Auth form
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
+
+
 
   // Project form
   const [name, setName] = useState("");
