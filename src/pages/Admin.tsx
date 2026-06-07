@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, LogIn, LogOut, User, Save, Upload, X, Pencil } from "lucide-react";
+import { Loader2, Plus, Trash2, User, Save, Upload, X, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Session } from "@supabase/supabase-js";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { PREDEFINED_TECHS } from "@/lib/technologies";
 import EditProjectDialog from "@/components/EditProjectDialog";
